@@ -125,15 +125,12 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
 
         Set<WrappedGoal> goals = handle.goalSelector.getAvailableGoals();
         synchronized (goals) {
+            goals.removeIf(Objects::isNull);
+
             HashSet<WrappedGoal> toAdd = new HashSet<>();
             HashSet<WrappedGoal> toRemove = new HashSet<>();
 
             for (WrappedGoal pgw : goals) {
-                if (pgw == null) {
-                    toRemove.add(null);
-                    continue;
-                }
-
                 Goal goal = pgw.getGoal();
                 if (goal == null) {
                     toRemove.add(pgw);
