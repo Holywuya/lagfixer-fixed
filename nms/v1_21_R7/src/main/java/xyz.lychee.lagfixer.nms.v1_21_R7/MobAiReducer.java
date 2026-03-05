@@ -36,6 +36,7 @@ import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftCreature;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.event.EventHandler;
@@ -97,6 +98,11 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
 
     @Override
     public void optimize(org.bukkit.entity.Entity ent, boolean init) {
+        if (this.getModule().isAsync() && !Bukkit.isPrimaryThread()) {
+            SupportManager.getInstance().getFork().runNow(false, ent.getLocation(), () -> this.optimize(ent, init));
+            return;
+        }
+
         if (!(ent instanceof CraftCreature)) return;
 
         PathfinderMob handle = ((CraftCreature) ent).getHandle();
@@ -123,7 +129,16 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
             HashSet<WrappedGoal> toRemove = new HashSet<>();
 
             for (WrappedGoal pgw : goals) {
+                if (pgw == null) {
+                    toRemove.add(null);
+                    continue;
+                }
+
                 Goal goal = pgw.getGoal();
+                if (goal == null) {
+                    toRemove.add(pgw);
+                    continue;
+                }
                 Class<?> goalClass = goal.getClass();
 
                 if (keepDedicated && !goalClass.getName().contains("ai.goal")) {
