@@ -31,7 +31,6 @@ dependencies {
     implementation(project(":nms:v1_21_R5"))
     implementation(project(":nms:v1_21_R6"))
     implementation(project(":nms:v1_21_R7"))
-
     implementation(project(":support:common"))
     implementation(project(":support:spigot"))
     implementation(project(":support:paper"))
