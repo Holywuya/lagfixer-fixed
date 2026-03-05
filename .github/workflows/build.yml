@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,5 +22,8 @@ jobs:
           java-version: "21"
           cache: gradle
 
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
       - name: Build with Gradle
-        run: ./gradlew --no-daemon build
+        run: ./gradlew --no-daemon build --stacktrace
